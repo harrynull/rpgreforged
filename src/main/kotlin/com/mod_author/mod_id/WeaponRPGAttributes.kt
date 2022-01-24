@@ -58,10 +58,8 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
         damageSpread = 1.0
     }
 
-    override fun toolTipName(): Text = itemStack.name.apply {
-        if (style.color?.rgb == null || style.color?.rgb == 0xFFFFFF)
-            style.withColor(rarity.formatting.colorValue!!)
-    }
+    override fun toolTipName(): Text = LiteralText(itemStack.name.string)
+        .formatted(rarity.formatting)
 
     override fun toolTipBody(): List<Text> {
         return listOf(
