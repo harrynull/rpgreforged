@@ -13,7 +13,7 @@
     "sources": "https://example.com/"
   },
   "license": "GNU Lesser General Public License version 3 (LGPLv3)",
-  "icon": "assets/mod_name/icon.png",
+  "icon": "assets/tutorial/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
@@ -21,6 +21,9 @@
         "adapter": "kotlin",
         "value": "com.mod_author.mod_id.ModName"
       }
+    ],
+    "cardinal-components": [
+      "com.mod_author.mod_id.MyComponents"
     ]
   },
   "mixins": [
@@ -32,5 +35,10 @@
     "fabric-language-kotlin": ">=1.7.1+kotlin.1.6.10",
     "minecraft": "1.18.x",
     "java": ">=17"
+  },
+  "custom": {
+    "cardinal-components": [
+      "mymod:weapon_attributes"
+    ]
   }
 }

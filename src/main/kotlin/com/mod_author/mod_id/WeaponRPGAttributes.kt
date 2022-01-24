@@ -1,28 +1,76 @@
 package com.mod_author.mod_id
 
+import com.mod_author.mod_id.mixins.SwordItemMixin
+import dev.onyxstudios.cca.api.v3.item.ItemComponent
+import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NbtCompound
-import kotlin.random.Random
+import net.minecraft.item.SwordItem
+import net.minecraft.text.LiteralText
+import net.minecraft.text.Text
+import net.minecraft.util.Rarity
+import java.util.*
 
+interface RPGItemAttributes {
+    val rarity: Rarity
+}
 
-const val RPG_ATTRIBUTES = "rpg_attributes"
+interface WeaponAttributes : RPGItemAttributes {
+    var baseDamage: Double
+    var damageSpread: Double
+    var attackSpeed: Double
+    val minDamage: Double
+    val maxDamage: Double
+    val dps: Double
+    fun getRandomDamage(random: Random): Double
+    fun toolTipName(): Text
+    fun toolTipBody(): List<Text>
+}
 
-class WeaponRPGAttributes(val compound: NbtCompound) {
-    constructor(stack: ItemStack) : this(stack.nbt!!.getCompound(RPG_ATTRIBUTES))
+class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
+    WeaponAttributes, ItemComponent(itemStack, MyComponents.WEAPON_ATTRIBUTES) {
 
-    var baseDamage: Double by NBT(compound, BASE_DAMAGE)
-    var damageSpread: Double by NBT(compound, SPREAD)
-    var attackSpeed: Double by NBT(compound, ATTACK_SPEED)
+    override var baseDamage: Double = 0.0
+    override var damageSpread: Double = 0.0
+    override var attackSpeed: Double = 0.0
 
-    val minDamage = baseDamage * (1 - damageSpread)
-    val maxDamage = baseDamage * (1 + damageSpread)
-    val dps = baseDamage * (4 - attackSpeed)
-    val randomDamage: Double
-        get() = Random.nextDouble(minDamage, maxDamage)
+    override val minDamage get() = baseDamage * (1 - damageSpread)
+    override val maxDamage get() = baseDamage * (1 + damageSpread)
+    override val dps get() = baseDamage * (4 - attackSpeed)
+    override fun getRandomDamage(random: Random): Double =
+        baseDamage + (random.nextDouble() * 2 - 1) * damageSpread * baseDamage
 
-    companion object {
-        const val BASE_DAMAGE = "base_damage"
-        const val ATTACK_SPEED = "attack_speed"
-        const val SPREAD = "spread"
+    private fun modRarity(): Rarity {
+        return if (dps > 50) Rarity.EPIC
+        else if (dps > 30) Rarity.RARE
+        else if (dps > 15) Rarity.UNCOMMON
+        else Rarity.COMMON
+    }
+
+    override val rarity: Rarity
+        get() = listOf(modRarity(), itemStack.rarity).maxByOrNull { it.ordinal }!!
+
+    init {
+        baseDamage = (itemStack.item as SwordItem).attackDamage.toDouble()
+        attackSpeed = (itemStack.item as SwordItemMixin)
+            .attributeModifiers[EntityAttributes.GENERIC_ATTACK_SPEED]
+            .find { it.id == ATTACK_SPEED_MODIFIER_ID }
+            ?.value ?: 0.0
+        damageSpread = 1.0
+    }
+
+    override fun toolTipName(): Text = itemStack.name.apply {
+        if (style.color?.rgb == null || style.color?.rgb == 0xFFFFFF)
+            style.withColor(rarity.formatting.colorValue!!)
+    }
+
+    override fun toolTipBody(): List<Text> {
+        return listOf(
+            LiteralText("$rarity ITEM").formatted(rarity.formatting),
+            LiteralText(
+                "Damage: ${minDamage.toString(1)} ~ " +
+                    "${maxDamage.toString(1)} " +
+                    "(DPS ${dps.toString(1)})"
+            )
+        )
     }
 }

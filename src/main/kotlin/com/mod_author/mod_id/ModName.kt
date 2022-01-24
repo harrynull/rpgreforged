@@ -3,8 +3,6 @@ package com.mod_author.mod_id
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.text.LiteralText
-import net.minecraft.text.TranslatableText
 
 class PlayerRPGAttributes(val compound: NbtCompound) {
     var constitution: Double by NBT(compound, CONSTITUTION)
@@ -27,28 +25,23 @@ object ModName : ModInitializer {
 
     override fun onInitialize() {
         ItemTooltipCallback.EVENT.register { itemStack, context, texts ->
-            if (itemStack.nbt?.contains(RPG_ATTRIBUTES) == true) {
-                val attributes = WeaponRPGAttributes(itemStack)
-                // hide attack damage since it's dynamic
-                texts.removeAll {
-                    ((it as? TranslatableText?)
-                        ?.args?.lastOrNull() as? TranslatableText?)
-                        ?.key in listOf(
-                        "attribute.name.generic.attack_damage",
-                        "attribute.name.generic.attack_speed"
-                    )
-                }
-                val customLines = listOf(
-                    LiteralText("${itemStack!!.rarity} Item").formatted(itemStack.rarity.formatting),
+            val attributes = MyComponents.WEAPON_ATTRIBUTES.maybeGet(itemStack)
+                .takeIf { it.isPresent }?.get()
+                ?: return@register
 
-                    LiteralText(
-                        "Damage: ${attributes.minDamage.toString(1)} ~ " +
-                            "${attributes.maxDamage.toString(1)} " +
-                            "(DPS ${attributes.dps.toString(1)})"
-                    )
+            // hide attack damage since it's dynamic
+            /*
+            texts.removeAll {
+                ((it as? TranslatableText?)
+                    ?.args?.lastOrNull() as? TranslatableText?)
+                    ?.key in listOf(
+                    "attribute.name.generic.attack_damage",
+                    "attribute.name.generic.attack_speed"
                 )
-                texts!!.addAll(1, customLines)
-            }
+            }*/
+            texts!!.removeAt(0)
+            texts!!.add(0, attributes.toolTipName())
+            texts!!.addAll(1, attributes.toolTipBody())
         }
         println("Example mod has been initialized.")
     }
