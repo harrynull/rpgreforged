@@ -17,8 +17,6 @@ public class PlayerAttributesMixin {
                 .add(AttributesKt.getATTRIBUTE_CONSTITUTION().getAttribute())
                 .add(AttributesKt.getATTRIBUTE_STRENGTH().getAttribute())
                 .add(AttributesKt.getATTRIBUTE_DEFENSE().getAttribute())
-                .add(AttributesKt.getATTRIBUTE_DEXTERITY().getAttribute())
-                .add(AttributesKt.getATTRIBUTE_EXP().getAttribute());
+                .add(AttributesKt.getATTRIBUTE_DEXTERITY().getAttribute());
     }
-
 }

@@ -45,7 +45,8 @@
   },
   "custom": {
     "cardinal-components": [
-      "mymod:weapon_attributes"
+      "mymod:weapon_attributes",
+      "mymod:player_attributes"
     ]
   }
 }

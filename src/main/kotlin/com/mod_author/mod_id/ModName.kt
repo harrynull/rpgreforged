@@ -31,9 +31,8 @@ object ModName : ModInitializer {
                     "attribute.name.generic.attack_speed"
                 )
             }*/
-            texts!!.removeAt(0)
-            texts!!.add(0, attributes.toolTipName())
-            texts!!.addAll(1, attributes.toolTipBody())
+            texts!!.removeAt(0) // remove name
+            texts.addAll(0, attributes.toolTip())
         }
         println("Example mod has been initialized.")
     }

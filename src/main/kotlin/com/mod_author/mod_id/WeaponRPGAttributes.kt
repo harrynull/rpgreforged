@@ -2,22 +2,30 @@ package com.mod_author.mod_id
 
 import com.mod_author.mod_id.mixins.SwordItemMixin
 import dev.onyxstudios.cca.api.v3.item.ItemComponent
-import net.minecraft.entity.attribute.ClampedEntityAttribute
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.item.ItemStack
 import net.minecraft.item.SwordItem
 import net.minecraft.text.LiteralText
 import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import net.minecraft.util.Rarity
-import net.minecraft.util.registry.Registry
 import java.util.*
+import kotlin.math.roundToInt
 
 val ATTACK_SPEED_MODIFIER_ID = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3")
 
-
+data class Socket(val dummy: Int)
+data class Reforge(val name: String)
 
 interface RPGItemAttributes {
     val rarity: Rarity
+    val levelRequirement: Int
+
+    var reforge: Reforge // effect strength dependent on quality
+    val quality: Int // stars from 1 to 5
+    val sockets: List<Socket> // dependent on quality
+
+    fun numberOfSocketsByQuality(quality: Int): Int = quality.div(2.0).roundToInt()
 }
 
 interface WeaponAttributes : RPGItemAttributes {
@@ -27,10 +35,11 @@ interface WeaponAttributes : RPGItemAttributes {
     val minDamage: Double
     val maxDamage: Double
     val dps: Double
+
     fun getRandomDamage(random: Random): Double
-    fun toolTipName(): Text
-    fun toolTipBody(): List<Text>
+    fun toolTip(): List<Text>
 }
+
 
 class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
     WeaponAttributes, ItemComponent(itemStack, MyComponents.WEAPON_ATTRIBUTES) {
@@ -39,6 +48,13 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
     override var damageSpread: Double = 0.0
     override var attackSpeed: Double = 0.0
 
+    override val levelRequirement: Int = 0
+
+    override var reforge: Reforge = Reforge(name = "Normal") // effect strength dependent on quality
+    override val quality: Int = 5 // stars from 1 to 5
+    override val sockets: List<Socket> =
+        (1..numberOfSocketsByQuality(quality)).map { Socket(1) } // dependent on quality
+
     override val minDamage get() = baseDamage * (1 - damageSpread)
     override val maxDamage get() = baseDamage * (1 + damageSpread)
     override val dps get() = baseDamage * (4 - attackSpeed)
@@ -46,9 +62,9 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
         baseDamage + (random.nextDouble() * 2 - 1) * damageSpread * baseDamage
 
     private fun modRarity(): Rarity {
-        return if (dps > 50) Rarity.EPIC
+        return if (dps > 40) Rarity.EPIC
         else if (dps > 30) Rarity.RARE
-        else if (dps > 15) Rarity.UNCOMMON
+        else if (dps > 26) Rarity.UNCOMMON
         else Rarity.COMMON
     }
 
@@ -64,17 +80,31 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
         damageSpread = 1.0
     }
 
-    override fun toolTipName(): Text = LiteralText(itemStack.name.string)
-        .formatted(rarity.formatting)
-
-    override fun toolTipBody(): List<Text> {
-        return listOf(
+    override fun toolTip(): List<Text> {
+        val basicInfo = listOf(
+            LiteralText(reforge.name + " ")
+                .append(LiteralText(itemStack.name.string).formatted(rarity.formatting)),
+            LiteralText(" " + "★".repeat(quality)).formatted(Formatting.YELLOW),
             LiteralText("$rarity ITEM").formatted(rarity.formatting),
             LiteralText(
                 "Damage: ${minDamage.toString(1)} ~ " +
                     "${maxDamage.toString(1)} " +
                     "(DPS ${dps.toString(1)})"
-            )
+            ),
+            LiteralText("")
         )
+
+        val sockets: List<Text> = if (sockets.isNotEmpty())
+            sockets.map { LiteralText("<> Empty") }.toMutableList().apply {
+                add(0, LiteralText("Sockets:"))
+                add(LiteralText(""))
+            }
+        else listOf()
+
+        val otherInfo = listOf(
+            LiteralText("Requires $levelRequirement lv to use").formatted(Formatting.GRAY)
+        )
+
+        return basicInfo + sockets + otherInfo
     }
 }
