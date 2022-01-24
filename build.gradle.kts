@@ -17,6 +17,11 @@ repositories {
         name = "Ladysnake Mods"
         url = uri("https://ladysnake.jfrog.io/artifactory/mods")
     }
+
+    maven {
+        name = "CottonMC"
+        url = uri("https://server.bbkr.space/artifactory/libs-release")
+    }
 }
 dependencies {
     val minecraftVersion: String by project
@@ -33,6 +38,8 @@ dependencies {
     modImplementation("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:4.0.1")
     modImplementation("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-item:4.0.1")
     modImplementation("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:4.0.1")
+
+    modImplementation(include("io.github.cottonmc:LibGui:5.3.0+1.18")!!)
 }
 tasks {
     val javaVersion = JavaVersion.VERSION_17

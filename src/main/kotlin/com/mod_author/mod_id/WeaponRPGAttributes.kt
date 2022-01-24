@@ -2,13 +2,19 @@ package com.mod_author.mod_id
 
 import com.mod_author.mod_id.mixins.SwordItemMixin
 import dev.onyxstudios.cca.api.v3.item.ItemComponent
+import net.minecraft.entity.attribute.ClampedEntityAttribute
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.item.ItemStack
 import net.minecraft.item.SwordItem
 import net.minecraft.text.LiteralText
 import net.minecraft.text.Text
 import net.minecraft.util.Rarity
+import net.minecraft.util.registry.Registry
 import java.util.*
+
+val ATTACK_SPEED_MODIFIER_ID = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3")
+
+
 
 interface RPGItemAttributes {
     val rarity: Rarity

@@ -1,7 +1,15 @@
 package com.mod_author.mod_id
 
+import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.option.KeyBinding
+import net.minecraft.client.util.InputUtil
+import org.lwjgl.glfw.GLFW
+
 
 @Suppress("UNUSED")
 object ModName : ModInitializer {
@@ -29,4 +37,26 @@ object ModName : ModInitializer {
         }
         println("Example mod has been initialized.")
     }
+}
+
+class ClientEntrypoint : ClientModInitializer {
+    override fun onInitializeClient() {
+        ClientTickEvents.END_CLIENT_TICK.register(ClientTickEvents.EndTick { client: MinecraftClient ->
+            if (keyBinding.wasPressed()) {
+                MinecraftClient.getInstance().setScreen(ProfileUIScreen(ProfileGUI()))
+            }
+        })
+    }
+
+    companion object {
+        val keyBinding = KeyBindingHelper.registerKeyBinding(
+            KeyBinding(
+                "key.examplemod.profile",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_P, // The keycode of the key
+                "category.examplemod.test" // The translation key of the keybinding's category.
+            )
+        )
+    }
+
 }
