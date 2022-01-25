@@ -2,6 +2,7 @@ package com.mod_author.mod_id
 
 import com.google.common.math.IntMath.pow
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent
+import net.minecraft.entity.attribute.AttributeContainer
 import net.minecraft.entity.attribute.ClampedEntityAttribute
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.player.PlayerEntity
@@ -23,6 +24,15 @@ enum class AttributeType(id: String, default: Double, translationKey: String) {
             Registry.ATTRIBUTE, id,
             ClampedEntityAttribute(translationKey, default, 0.0, 2000.0).setTracked(true)
         )
+    }
+    companion object{
+        fun fill(container: AttributeContainer, attributes: PlayerAttributes) {
+            values().forEach { attr ->
+                container.getCustomInstance(attr.attribute)!!.baseValue =
+                    (attributes.abilityBase[attr]
+                        ?: PlayerAttributeComponent.DEFAULT_ATTRIBUTES[attr]!!).toDouble()
+            }
+        }
     }
 }
 
@@ -51,12 +61,7 @@ class PlayerAttributeComponent(
         private set
     override var exp: Int = 0
         private set
-    override var abilityBase: MutableMap<AttributeType, Int> = mutableMapOf(
-        AttributeType.CONSTITUTION to 10,
-        AttributeType.DEFENSE to 0,
-        AttributeType.DEXTERITY to 0,
-        AttributeType.DEFENSE to 0,
-    )
+    override var abilityBase: MutableMap<AttributeType, Int> = DEFAULT_ATTRIBUTES
         private set
 
     override fun gainExp(expGained: Int) {
@@ -81,8 +86,12 @@ class PlayerAttributeComponent(
         abilityPoints = tag.getInt("ability_points")
         exp = tag.getInt("exp")
         val baseValues = tag.getIntArray("base_values")
-        abilityBase.keys.forEachIndexed { index, attributeType ->
-            abilityBase[attributeType] = baseValues[index]
+        if (baseValues.size >= AttributeType.values().size) {
+            abilityBase.keys.forEachIndexed { index, attributeType ->
+                abilityBase[attributeType] = baseValues[index]
+            }
+        } else {
+            DEFAULT_ATTRIBUTES.forEach { (k, v) -> abilityBase[k] = v }
         }
     }
 
@@ -90,6 +99,15 @@ class PlayerAttributeComponent(
         tag.putInt("ability_points", abilityPoints)
         tag.putInt("exp", exp)
         tag.putIntArray("base_values", abilityBase.values.toList())
+    }
+
+    companion object {
+        val DEFAULT_ATTRIBUTES = mutableMapOf(
+            AttributeType.CONSTITUTION to 10,
+            AttributeType.DEFENSE to 0,
+            AttributeType.DEXTERITY to 0,
+            AttributeType.STRENGTH to 0,
+        )
     }
 }
 

@@ -1,32 +1,23 @@
 package com.mod_author.mod_id
 
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
 import com.mod_author.mod_id.mixins.SwordItemMixin
 import dev.onyxstudios.cca.api.v3.item.ItemComponent
+import net.minecraft.entity.attribute.EntityAttribute
+import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
 import net.minecraft.item.ItemStack
 import net.minecraft.item.SwordItem
 import net.minecraft.text.LiteralText
 import net.minecraft.text.Text
+import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import net.minecraft.util.Rarity
 import java.util.*
 import kotlin.math.roundToInt
 
 val ATTACK_SPEED_MODIFIER_ID = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3")
-
-
-abstract class Socket {
-    abstract fun descriptor(): Text
-    abstract fun applyModifiers()
-}
-
-class EmptySocket : Socket() {
-    override fun descriptor(): Text = LiteralText("<> Empty").formatted(Formatting.GRAY)
-
-    override fun applyModifiers() {}
-}
-
-data class Reforge(val name: String)
 
 interface RPGItemAttributes {
     val rarity: Rarity
@@ -61,10 +52,10 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
 
     override val levelRequirement: Int = 1
 
-    override var reforge: Reforge = Reforge(name = "Normal") // effect strength dependent on quality
+    override var reforge: Reforge = LegendaryReforge() // effect strength dependent on quality
     override val quality: Int = 5 // stars from 1 to 5
-    override val sockets: List<Socket> =
-        (1..numberOfSocketsByQuality(quality)).map { EmptySocket() } // dependent on quality
+    override val sockets: List<Socket> = // number dependent on quality
+        (1..numberOfSocketsByQuality(quality)).map { StrengthGem() }
 
     override val minDamage get() = baseDamage * (1 - damageSpread)
     override val maxDamage get() = baseDamage * (1 + damageSpread)
@@ -105,6 +96,16 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
             LiteralText("")
         )
 
+        val multiMap = HashMultimap.create<EntityAttribute, EntityAttributeModifier>()
+        applyEnhancements(multiMap)
+        val attributes = multiMap.keySet().map { attr ->
+            val sum =
+                multiMap[attr].filter { it.operation == EntityAttributeModifier.Operation.ADDITION }
+                    .sumOf { it.value }
+            TranslatableText(attr.translationKey).append(LiteralText(": $sum"))
+                .formatted(Formatting.AQUA)
+        } + listOf(LiteralText(""))
+
         val sockets: List<Text> = if (sockets.isNotEmpty())
             sockets.map { LiteralText(" ").append(it.descriptor()) }.toMutableList().apply {
                 add(0, LiteralText("Sockets:"))
@@ -116,6 +117,11 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
             LiteralText("Requires Lv $levelRequirement to use").formatted(Formatting.GRAY)
         )
 
-        return basicInfo + sockets + otherInfo
+        return basicInfo + attributes + sockets + otherInfo
+    }
+
+    private fun applyEnhancements(multiMap: Multimap<EntityAttribute, EntityAttributeModifier>) {
+        reforge.applyModifiers(multiMap, quality)
+        sockets.forEach { it.applyModifiers(multiMap, quality) }
     }
 }
