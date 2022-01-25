@@ -2,6 +2,7 @@ plugins {
     id("fabric-loom")
     val kotlinVersion: String by System.getProperties()
     kotlin("jvm").version(kotlinVersion)
+    kotlin("plugin.serialization") version "1.6.10"
 }
 base {
     val archivesBaseName: String by project
@@ -38,7 +39,7 @@ dependencies {
     modImplementation("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-base:4.0.1")
     modImplementation("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-item:4.0.1")
     modImplementation("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:4.0.1")
-
+    modImplementation("io.github.natanfudge:fabric-drawer:4.1.0-1.17.1")
     modImplementation(include("io.github.cottonmc:LibGui:5.3.0+1.18")!!)
 }
 tasks {

@@ -14,7 +14,18 @@ import kotlin.math.roundToInt
 
 val ATTACK_SPEED_MODIFIER_ID = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3")
 
-data class Socket(val dummy: Int)
+
+abstract class Socket {
+    abstract fun descriptor(): Text
+    abstract fun applyModifiers()
+}
+
+class EmptySocket : Socket() {
+    override fun descriptor(): Text = LiteralText("<> Empty").formatted(Formatting.GRAY)
+
+    override fun applyModifiers() {}
+}
+
 data class Reforge(val name: String)
 
 interface RPGItemAttributes {
@@ -48,12 +59,12 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
     override var damageSpread: Double = 0.0
     override var attackSpeed: Double = 0.0
 
-    override val levelRequirement: Int = 0
+    override val levelRequirement: Int = 1
 
     override var reforge: Reforge = Reforge(name = "Normal") // effect strength dependent on quality
     override val quality: Int = 5 // stars from 1 to 5
     override val sockets: List<Socket> =
-        (1..numberOfSocketsByQuality(quality)).map { Socket(1) } // dependent on quality
+        (1..numberOfSocketsByQuality(quality)).map { EmptySocket() } // dependent on quality
 
     override val minDamage get() = baseDamage * (1 - damageSpread)
     override val maxDamage get() = baseDamage * (1 + damageSpread)
@@ -77,14 +88,14 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
             .attributeModifiers[EntityAttributes.GENERIC_ATTACK_SPEED]
             .find { it.id == ATTACK_SPEED_MODIFIER_ID }
             ?.value ?: 0.0
-        damageSpread = 1.0
+        damageSpread = 0.2
     }
 
     override fun toolTip(): List<Text> {
         val basicInfo = listOf(
-            LiteralText(reforge.name + " ")
-                .append(LiteralText(itemStack.name.string).formatted(rarity.formatting)),
-            LiteralText(" " + "★".repeat(quality)).formatted(Formatting.YELLOW),
+            LiteralText(reforge.name + " " + itemStack.name.string + " ").formatted(rarity.formatting).append(
+                LiteralText("★".repeat(quality)).formatted(Formatting.YELLOW)
+            ),
             LiteralText("$rarity ITEM").formatted(rarity.formatting),
             LiteralText(
                 "Damage: ${minDamage.toString(1)} ~ " +
@@ -95,14 +106,14 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
         )
 
         val sockets: List<Text> = if (sockets.isNotEmpty())
-            sockets.map { LiteralText("<> Empty") }.toMutableList().apply {
+            sockets.map { LiteralText(" ").append(it.descriptor()) }.toMutableList().apply {
                 add(0, LiteralText("Sockets:"))
                 add(LiteralText(""))
             }
         else listOf()
 
         val otherInfo = listOf(
-            LiteralText("Requires $levelRequirement lv to use").formatted(Formatting.GRAY)
+            LiteralText("Requires Lv $levelRequirement to use").formatted(Formatting.GRAY)
         )
 
         return basicInfo + sockets + otherInfo

@@ -34,6 +34,7 @@ object ModName : ModInitializer {
             texts!!.removeAt(0) // remove name
             texts.addAll(0, attributes.toolTip())
         }
+        registerServerListeners()
         println("Example mod has been initialized.")
     }
 }
@@ -57,5 +58,4 @@ class ClientEntrypoint : ClientModInitializer {
             )
         )
     }
-
 }

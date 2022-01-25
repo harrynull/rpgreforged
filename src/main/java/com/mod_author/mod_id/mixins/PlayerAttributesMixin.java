@@ -1,6 +1,6 @@
 package com.mod_author.mod_id.mixins;
 
-import com.mod_author.mod_id.AttributesKt;
+import com.mod_author.mod_id.AttributeType;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -14,9 +14,9 @@ public class PlayerAttributesMixin {
     @Inject(method = "createPlayerAttributes", at = @At("RETURN"))
     private static void injected(CallbackInfoReturnable<DefaultAttributeContainer.Builder> cir) {
         cir.getReturnValue()
-                .add(AttributesKt.getATTRIBUTE_CONSTITUTION().getAttribute())
-                .add(AttributesKt.getATTRIBUTE_STRENGTH().getAttribute())
-                .add(AttributesKt.getATTRIBUTE_DEFENSE().getAttribute())
-                .add(AttributesKt.getATTRIBUTE_DEXTERITY().getAttribute());
+                .add(AttributeType.CONSTITUTION.getAttribute())
+                .add(AttributeType.STRENGTH.getAttribute())
+                .add(AttributeType.DEFENSE.getAttribute())
+                .add(AttributeType.DEXTERITY.getAttribute());
     }
 }
