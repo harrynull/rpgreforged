@@ -1,6 +1,6 @@
 package com.mod_author.mod_id
 
-import com.google.common.collect.Multimap
+import com.google.common.collect.ImmutableMultimap
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.text.LiteralText
@@ -11,7 +11,7 @@ import net.minecraft.util.Formatting
 abstract class Socket {
     abstract fun descriptor(): Text
     abstract fun applyModifiers(
-        multiMap: Multimap<EntityAttribute, EntityAttributeModifier>,
+        multiMap: ImmutableMultimap.Builder<EntityAttribute?, EntityAttributeModifier?>,
         quality: Int
     )
 }
@@ -20,7 +20,7 @@ class EmptySocket : Socket() {
     override fun descriptor(): Text = LiteralText("<> Empty").formatted(Formatting.GRAY)
 
     override fun applyModifiers(
-        multiMap: Multimap<EntityAttribute, EntityAttributeModifier>,
+        multiMap: ImmutableMultimap.Builder<EntityAttribute?, EntityAttributeModifier?>,
         quality: Int
     ) {
     }
@@ -30,10 +30,11 @@ class StrengthGem : Socket() {
     override fun descriptor(): Text = LiteralText("💪 Strength Gem").formatted(Formatting.RED)
 
     override fun applyModifiers(
-        multiMap: Multimap<EntityAttribute, EntityAttributeModifier>,
+        multiMap: ImmutableMultimap.Builder<EntityAttribute?, EntityAttributeModifier?>,
         quality: Int
     ) {
-        multiMap[AttributeType.STRENGTH.attribute].add(
+        multiMap.put(
+            AttributeType.STRENGTH.attribute,
             additionMultiplier(15.0, "Reforge")
         )
     }

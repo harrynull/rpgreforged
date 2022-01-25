@@ -7,15 +7,22 @@ import net.minecraft.entity.attribute.ClampedEntityAttribute
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.util.Formatting
 import net.minecraft.util.registry.Registry
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-enum class AttributeType(id: String, default: Double, translationKey: String) {
-    CONSTITUTION("rpg.constitution", 10.0, "rpg.attribute.constitution"),
-    STRENGTH("rpg.strength", 0.0, "rpg.attribute.strength"),
-    DEFENSE("rpg.defense", 0.0, "rpg.attribute.defense"),
-    DEXTERITY("rpg.dexterity", 0.0, "rpg.attribute.dexterity");
+enum class AttributeType(
+    id: String,
+    default: Double,
+    translationKey: String,
+    val icon: String,
+    val formatting: Formatting
+) {
+    CONSTITUTION("rpg.constitution", 10.0, "rpg.attribute.constitution", "\uD83E\uDE93", Formatting.YELLOW),
+    STRENGTH("rpg.strength", 0.0, "rpg.attribute.strength", "\uD83D\uDDE1", Formatting.RED),
+    DEFENSE("rpg.defense", 0.0, "rpg.attribute.defense", "\uD83D\uDEE1", Formatting.BLUE),
+    DEXTERITY("rpg.dexterity", 0.0, "rpg.attribute.dexterity", "\uD83C\uDFF9", Formatting.GREEN);
 
     val attribute: EntityAttribute
 
@@ -25,7 +32,8 @@ enum class AttributeType(id: String, default: Double, translationKey: String) {
             ClampedEntityAttribute(translationKey, default, 0.0, 2000.0).setTracked(true)
         )
     }
-    companion object{
+
+    companion object {
         fun fill(container: AttributeContainer, attributes: PlayerAttributes) {
             values().forEach { attr ->
                 container.getCustomInstance(attr.attribute)!!.baseValue =

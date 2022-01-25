@@ -1,8 +1,7 @@
 package com.mod_author.mod_id
 
-import com.google.common.collect.HashMultimap
+import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
-import com.mod_author.mod_id.mixins.SwordItemMixin
 import dev.onyxstudios.cca.api.v3.item.ItemComponent
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
@@ -18,6 +17,12 @@ import java.util.*
 import kotlin.math.roundToInt
 
 val ATTACK_SPEED_MODIFIER_ID = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3")
+
+interface SwordAttributesAccess {
+    fun getAttributeModifiers(): Multimap<EntityAttribute?, EntityAttributeModifier?>?
+
+    fun setAttributeModifiers(modifiers: Multimap<EntityAttribute?, EntityAttributeModifier?>)
+}
 
 interface RPGItemAttributes {
     val rarity: Rarity
@@ -75,11 +80,17 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
 
     init {
         baseDamage = (itemStack.item as SwordItem).attackDamage.toDouble()
-        attackSpeed = (itemStack.item as SwordItemMixin)
-            .attributeModifiers[EntityAttributes.GENERIC_ATTACK_SPEED]
-            .find { it.id == ATTACK_SPEED_MODIFIER_ID }
+        attackSpeed = ((itemStack.item as SwordItem) as SwordAttributesAccess)
+            .getAttributeModifiers()!![EntityAttributes.GENERIC_ATTACK_SPEED]
+            .find { it!!.id == ATTACK_SPEED_MODIFIER_ID }
             ?.value ?: 0.0
         damageSpread = 0.2
+
+        ((itemStack.item as SwordItem) as SwordAttributesAccess).setAttributeModifiers(
+            ImmutableMultimap.builder<EntityAttribute, EntityAttributeModifier>().apply {
+                applyEnhancements(this)
+            }.build()
+        )
     }
 
     override fun toolTip(): List<Text> {
@@ -96,14 +107,19 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
             LiteralText("")
         )
 
-        val multiMap = HashMultimap.create<EntityAttribute, EntityAttributeModifier>()
-        applyEnhancements(multiMap)
+        val multiMap = ImmutableMultimap.builder<EntityAttribute, EntityAttributeModifier>().apply {
+            applyEnhancements(this)
+        }.build()
+
         val attributes = multiMap.keySet().map { attr ->
             val sum =
                 multiMap[attr].filter { it.operation == EntityAttributeModifier.Operation.ADDITION }
                     .sumOf { it.value }
-            TranslatableText(attr.translationKey).append(LiteralText(": $sum"))
-                .formatted(Formatting.AQUA)
+            val attribute = AttributeType.values().single { it.attribute == attr }
+            LiteralText(attribute.icon)
+                .append(TranslatableText(attr.translationKey))
+                .append(LiteralText(": $sum"))
+                .formatted(attribute.formatting)
         } + listOf(LiteralText(""))
 
         val sockets: List<Text> = if (sockets.isNotEmpty())
@@ -120,7 +136,7 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
         return basicInfo + attributes + sockets + otherInfo
     }
 
-    private fun applyEnhancements(multiMap: Multimap<EntityAttribute, EntityAttributeModifier>) {
+    private fun applyEnhancements(multiMap: ImmutableMultimap.Builder<EntityAttribute?, EntityAttributeModifier?>) {
         reforge.applyModifiers(multiMap, quality)
         sockets.forEach { it.applyModifiers(multiMap, quality) }
     }
