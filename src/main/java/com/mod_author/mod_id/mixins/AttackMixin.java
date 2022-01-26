@@ -1,5 +1,6 @@
 package com.mod_author.mod_id.mixins;
 
+import com.mod_author.mod_id.AttributeType;
 import com.mod_author.mod_id.MyComponents;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttribute;
@@ -22,9 +23,10 @@ public class AttackMixin {
         var mainHandFirstAttribute = mainHand.getAttributeModifiers(EquipmentSlot.MAINHAND)
                 .get(entityAttribute).stream().findFirst();
         var offset = mainHandFirstAttribute.map(EntityAttributeModifier::getValue).orElse(0.0);
+        var strength = instance.getAttributeValue(AttributeType.STRENGTH.getAttribute());
         if (attributes.isEmpty()) return baseVal;
         return baseVal
-                + attributes.get().getRandomDamage(instance.getRandom())
+                + attributes.get().getRandomDamage(instance.getRandom()) * (1 + strength / 100)
                 - offset;
     }
 }

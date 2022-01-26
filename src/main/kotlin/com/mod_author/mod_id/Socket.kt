@@ -27,7 +27,8 @@ class EmptySocket : Socket() {
 }
 
 class StrengthGem : Socket() {
-    override fun descriptor(): Text = LiteralText("💪 Strength Gem").formatted(Formatting.RED)
+    override fun descriptor(): Text =
+        LiteralText("${AttributeType.STRENGTH.icon} Strength Gem").formatted(Formatting.RED)
 
     override fun applyModifiers(
         multiMap: ImmutableMultimap.Builder<EntityAttribute?, EntityAttributeModifier?>,

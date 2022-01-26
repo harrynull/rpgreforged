@@ -116,7 +116,7 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
                 multiMap[attr].filter { it.operation == EntityAttributeModifier.Operation.ADDITION }
                     .sumOf { it.value }
             val attribute = AttributeType.values().single { it.attribute == attr }
-            LiteralText(attribute.icon)
+            LiteralText(attribute.icon + " ")
                 .append(TranslatableText(attr.translationKey))
                 .append(LiteralText(": $sum"))
                 .formatted(attribute.formatting)
