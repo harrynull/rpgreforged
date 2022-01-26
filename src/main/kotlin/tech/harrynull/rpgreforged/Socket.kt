@@ -34,9 +34,9 @@ class StrengthGem : Socket() {
         multiMap: ImmutableMultimap.Builder<EntityAttribute?, EntityAttributeModifier?>,
         quality: Int
     ) {
-        multiMap.put(
-            AttributeType.STRENGTH.attribute,
-            additionMultiplier(15.0, "Reforge")
-        )
+        //multiMap.put(
+        //    AttributeType.STRENGTH.attribute.get(),
+        //    additionMultiplier(15.0, "Reforge")
+        //)
     }
 }

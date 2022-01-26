@@ -7,9 +7,7 @@
   },
   "mixins": [
     "AttackMixin",
-    "ExperienceMixin",
-    "MaxHealthMixin",
-    "PlayerAttributesMixin",
+    "ItemStackMixin",
     "SwordItemMixin"
   ]
 }

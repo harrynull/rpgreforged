@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "rpgreforged",
   "version": "${version}",
-  "name": "Mod Name",
+  "name": "RPGReforged",
   "description": "Mod Description",
   "authors": [
     "Author"
@@ -41,7 +41,8 @@
     "fabric-language-kotlin": ">=1.7.1+kotlin.1.6.10",
     "fabric-key-binding-api-v1": "*",
     "minecraft": "1.18.x",
-    "java": ">=17"
+    "java": ">=17",
+    "playerex": ">=3.1.0"
   },
   "custom": {
     "cardinal-components": [

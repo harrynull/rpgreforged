@@ -1,14 +1,6 @@
 package tech.harrynull.rpgreforged
 
-import drawer.readFrom
-import drawer.write
-import io.netty.buffer.Unpooled
-import kotlinx.serialization.Serializable
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
-import net.minecraft.network.PacketByteBuf
-import net.minecraft.util.Identifier
-
+/*
 val ID_USE_ABILITY_POINTS = Identifier("modid", "use_ability_points")
 
 @Serializable
@@ -27,4 +19,4 @@ fun registerServerListeners() {
         val component = MyComponents.PLAYER_ATTRIBUTES.get(player)
         component.useAbilityPoints(1, AttributeType.valueOf(request.attributeName))
     }
-}
+}*/

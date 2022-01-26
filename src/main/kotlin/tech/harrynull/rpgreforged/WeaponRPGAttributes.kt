@@ -3,6 +3,7 @@ package tech.harrynull.rpgreforged
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap
 import dev.onyxstudios.cca.api.v3.item.ItemComponent
+import net.minecraft.entity.EquipmentSlot
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import net.minecraft.entity.attribute.EntityAttributes
@@ -13,16 +14,11 @@ import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.Formatting
 import net.minecraft.util.Rarity
+import tech.harrynull.rpgreforged.mixins.SwordItemMixin
 import java.util.*
 import kotlin.math.roundToInt
 
 val ATTACK_SPEED_MODIFIER_ID = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3")
-
-interface SwordAttributesAccess {
-    fun getAttributeModifiers(): Multimap<EntityAttribute?, EntityAttributeModifier?>?
-
-    fun setAttributeModifiers(modifiers: Multimap<EntityAttribute?, EntityAttributeModifier?>)
-}
 
 interface RPGItemAttributes {
     val rarity: Rarity
@@ -43,7 +39,7 @@ interface WeaponAttributes : RPGItemAttributes {
     val maxDamage: Double
     val dps: Double
 
-    fun getRandomDamage(random: Random): Double
+    fun getRandomDamageOffset(random: Random): Double
     fun toolTip(): List<Text>
 }
 
@@ -65,8 +61,8 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
     override val minDamage get() = baseDamage * (1 - damageSpread)
     override val maxDamage get() = baseDamage * (1 + damageSpread)
     override val dps get() = baseDamage * (4 - attackSpeed)
-    override fun getRandomDamage(random: Random): Double =
-        baseDamage + (random.nextDouble() * 2 - 1) * damageSpread * baseDamage
+    override fun getRandomDamageOffset(random: Random): Double =
+        (random.nextDouble() * 2 - 1) * damageSpread * baseDamage
 
     private fun modRarity(): Rarity {
         return if (dps > 40) Rarity.EPIC
@@ -80,17 +76,11 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
 
     init {
         baseDamage = (itemStack.item as SwordItem).attackDamage.toDouble()
-        attackSpeed = ((itemStack.item as SwordItem) as SwordAttributesAccess)
-            .getAttributeModifiers()!![EntityAttributes.GENERIC_ATTACK_SPEED]
+        attackSpeed = (itemStack.item as SwordItemMixin)
+            .attributeModifiers!![EntityAttributes.GENERIC_ATTACK_SPEED]
             .find { it!!.id == ATTACK_SPEED_MODIFIER_ID }
             ?.value ?: 0.0
         damageSpread = 0.2
-
-        ((itemStack.item as SwordItem) as SwordAttributesAccess).setAttributeModifiers(
-            ImmutableMultimap.builder<EntityAttribute, EntityAttributeModifier>().apply {
-                applyEnhancements(this)
-            }.build()
-        )
     }
 
     override fun toolTip(): List<Text> {
@@ -115,11 +105,16 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
             val sum =
                 multiMap[attr].filter { it.operation == EntityAttributeModifier.Operation.ADDITION }
                     .sumOf { it.value }
-            val attribute = AttributeType.values().single { it.attribute == attr }
-            LiteralText(attribute.icon + " ")
-                .append(TranslatableText(attr.translationKey))
-                .append(LiteralText(": $sum"))
-                .formatted(attribute.formatting)
+            val attribute = AttributeType.values().singleOrNull { it.attribute.get() == attr }
+            if (attribute != null) {
+                LiteralText(attribute.icon + " ")
+                    .append(TranslatableText(attr.translationKey))
+                    .append(LiteralText(": $sum"))
+                    .formatted(attribute.formatting)
+            } else {
+                TranslatableText(attr.translationKey)
+                    .append(LiteralText(": $sum"))
+            }
         } + listOf(LiteralText(""))
 
         val sockets: List<Text> = if (sockets.isNotEmpty())
@@ -136,8 +131,28 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
         return basicInfo + attributes + sockets + otherInfo
     }
 
-    private fun applyEnhancements(multiMap: ImmutableMultimap.Builder<EntityAttribute?, EntityAttributeModifier?>) {
+    fun applyEnhancements(multiMap: ImmutableMultimap.Builder<EntityAttribute?, EntityAttributeModifier?>) {
+        if ((AttributeType.STRENGTH.attribute.get() as EntityAttribute?) == null) return
+
         reforge.applyModifiers(multiMap, quality)
         sockets.forEach { it.applyModifiers(multiMap, quality) }
+
     }
+}
+
+fun addItemAttributes(
+    itemStack: ItemStack,
+    slot: EquipmentSlot,
+    modifiers: Multimap<EntityAttribute, EntityAttributeModifier>
+) {
+    val attributes = MyComponents.WEAPON_ATTRIBUTES.maybeGet(itemStack)
+        .takeIf { it.isPresent }?.get() ?: return
+
+    if (slot != EquipmentSlot.MAINHAND) return
+
+    val addedMap = ImmutableMultimap.builder<EntityAttribute, EntityAttributeModifier>().apply {
+        attributes.applyEnhancements(this)
+    }.build()
+
+    modifiers.putAll(addedMap)
 }

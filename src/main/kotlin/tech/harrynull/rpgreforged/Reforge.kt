@@ -20,21 +20,21 @@ class LegendaryReforge : Reforge() {
         quality: Int
     ) {
         multiMap.put(
-            AttributeType.STRENGTH.attribute,
+            AttributeType.CONSTITUTION.attribute.get(),
+            additionMultiplier(10.0 * quality, "Reforge")
+        )
+        /*multiMap.put(
+            AttributeType.STRENGTH.attribute.get(),
             additionMultiplier(10.0 * quality, "Reforge")
         )
         multiMap.put(
-            AttributeType.CONSTITUTION.attribute,
+            AttributeType.DEXTERITY.attribute.get(),
             additionMultiplier(10.0 * quality, "Reforge")
         )
         multiMap.put(
-            AttributeType.DEXTERITY.attribute,
+            AttributeType.INTELLIGENCE.attribute.get(),
             additionMultiplier(10.0 * quality, "Reforge")
-        )
-        multiMap.put(
-            AttributeType.DEFENSE.attribute,
-            additionMultiplier(10.0 * quality, "Reforge")
-        )
+        )*/
     }
 
 }
