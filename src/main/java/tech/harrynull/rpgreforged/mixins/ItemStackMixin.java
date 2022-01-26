@@ -5,11 +5,16 @@ import com.google.common.collect.Multimap;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import tech.harrynull.rpgreforged.WeaponRPGAttributesKt;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import tech.harrynull.rpgreforged.MyComponents;
+import tech.harrynull.rpgreforged.RPGAttributesKt;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
@@ -24,8 +29,14 @@ public abstract class ItemStackMixin {
             modifiers.putAll(original);
         }
 
-        WeaponRPGAttributesKt.addItemAttributes(stack, slot, modifiers);
+        RPGAttributesKt.addItemAttributes(stack, slot, modifiers);
 
         return modifiers;
+    }
+
+    @Inject(method = "onCraft", at = @At(value = "RETURN"))
+    public void onCraft(World world, PlayerEntity player, int amount, CallbackInfo ci) {
+        ItemStack stack = (ItemStack) (Object) this;
+        MyComponents.Companion.getWEAPON_ATTRIBUTES().get(stack).forge();
     }
 }

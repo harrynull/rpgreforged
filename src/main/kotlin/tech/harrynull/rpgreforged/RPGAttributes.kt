@@ -26,9 +26,24 @@ interface RPGItemAttributes {
 
     var reforge: Reforge // effect strength dependent on quality
     val quality: Int // stars from 1 to 5
-    val sockets: List<Socket> // dependent on quality
+    val sockets: MutableList<Socket> // dependent on quality
 
     fun numberOfSocketsByQuality(quality: Int): Int = quality.div(2.0).roundToInt()
+
+    fun canAddSocket(socket: Socket): Boolean = sockets.any { it == Socket.EmptySocket }
+
+    fun addSocket(socket: Socket) {
+        sockets[sockets.indexOfFirst { it == Socket.EmptySocket }] = socket
+    }
+
+    fun randomQuality(): Int {
+        val rand = kotlin.random.Random.nextDouble()
+        if (rand < 0.5) return 1 // 50%
+        if (rand < 0.7) return 2 // 20%
+        if (rand < 0.85) return 3 // 15%
+        if (rand < 0.95) return 4 // 10%
+        return 5 // 5%
+    }
 }
 
 interface WeaponAttributes : RPGItemAttributes {
@@ -51,12 +66,11 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
     override var damageSpread: Double = 0.0
     override var attackSpeed: Double = 0.0
 
-    override val levelRequirement: Int = 1
+    override var levelRequirement: Int = 1
 
-    override var reforge: Reforge = LegendaryReforge() // effect strength dependent on quality
-    override val quality: Int = 5 // stars from 1 to 5
-    override val sockets: List<Socket> = // number dependent on quality
-        (1..numberOfSocketsByQuality(quality)).map { StrengthGem() }
+    override var reforge: Reforge = Reforge.Raw // effect strength dependent on quality
+    override var quality: Int = 0 // stars from 1 to 5
+    override var sockets: MutableList<Socket> = mutableListOf() // number dependent on quality
 
     override val minDamage get() = baseDamage * (1 - damageSpread)
     override val maxDamage get() = baseDamage * (1 + damageSpread)
@@ -64,15 +78,41 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
     override fun getRandomDamageOffset(random: Random): Double =
         (random.nextDouble() * 2 - 1) * damageSpread * baseDamage
 
-    private fun modRarity(): Rarity {
-        return if (dps > 40) Rarity.EPIC
-        else if (dps > 30) Rarity.RARE
-        else if (dps > 26) Rarity.UNCOMMON
-        else Rarity.COMMON
+    override val rarity: Rarity
+        get() {
+            val modRarity = if (dps > 40) Rarity.EPIC
+            else if (dps > 30) Rarity.RARE
+            else if (dps > 26) Rarity.UNCOMMON
+            else Rarity.COMMON
+            return maxOf(modRarity, itemStack.rarity)
+        }
+
+    fun forge() {
+        quality = randomQuality()
+        sockets = (0..numberOfSocketsByQuality(quality)).map { Socket.EmptySocket }.toMutableList()
+        reforge = Reforge.randomReforge()
+        saveToNbt()
     }
 
-    override val rarity: Rarity
-        get() = listOf(modRarity(), itemStack.rarity).maxByOrNull { it.ordinal }!!
+    private fun saveToNbt() {
+        putInt("quality", quality)
+        sockets.forEachIndexed { index, socket -> putString("socket_$index", socket.name) }
+        putString("reforge", reforge.name)
+    }
+
+    private fun loadFromNbt() {
+        if (hasTag("quality")) quality = getInt("quality")
+        sockets = (0..quality).map {
+            if (hasTag("socket_$it"))
+                Socket.valueOf(getString("socket_$it"))
+            else Socket.EmptySocket
+        }.toMutableList()
+        if (hasTag("reforge")) reforge = Reforge.valueOf(getString("reforge"))
+        if (hasTag("damage_spread")) damageSpread = getDouble("damage_spread")
+        if (hasTag("base_damage")) baseDamage = getDouble("base_damage")
+        if (hasTag("attack_speed")) attackSpeed = getDouble("attack_speed")
+        if (hasTag("level_requirement")) levelRequirement = getInt("level_requirement")
+    }
 
     init {
         baseDamage = (itemStack.item as SwordItem).attackDamage.toDouble()
@@ -81,6 +121,7 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
             .find { it!!.id == ATTACK_SPEED_MODIFIER_ID }
             ?.value ?: 0.0
         damageSpread = 0.2
+        loadFromNbt()
     }
 
     override fun toolTip(): List<Text> {
@@ -90,7 +131,7 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
             ),
             LiteralText("$rarity ITEM").formatted(rarity.formatting),
             LiteralText(
-                "Damage: ${minDamage.toString(1)} ~ " +
+                "Base Damage: ${minDamage.toString(1)} ~ " +
                     "${maxDamage.toString(1)} " +
                     "(DPS ${dps.toString(1)})"
             ),
@@ -118,11 +159,11 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
         } + listOf(LiteralText(""))
 
         val sockets: List<Text> = if (sockets.isNotEmpty())
-            sockets.map { LiteralText(" ").append(it.descriptor()) }.toMutableList().apply {
+            sockets.map { LiteralText(" ").append(it.description) }.toMutableList().apply {
                 add(0, LiteralText("Sockets:"))
                 add(LiteralText(""))
             }
-        else listOf()
+        else listOf(LiteralText("Use a reforge station to unlock sockets.").formatted(Formatting.GRAY))
 
         val otherInfo = listOf(
             LiteralText("Requires Lv $levelRequirement to use").formatted(Formatting.GRAY)
@@ -134,10 +175,10 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
     fun applyEnhancements(multiMap: ImmutableMultimap.Builder<EntityAttribute?, EntityAttributeModifier?>) {
         if ((AttributeType.STRENGTH.attribute.get() as EntityAttribute?) == null) return
 
-        reforge.applyModifiers(multiMap, quality)
-        sockets.forEach { it.applyModifiers(multiMap, quality) }
-
+        reforge.modifier(multiMap, quality)
+        sockets.forEach { it.modifier(multiMap, quality) }
     }
+
 }
 
 fun addItemAttributes(
