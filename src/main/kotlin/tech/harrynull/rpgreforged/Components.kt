@@ -1,4 +1,4 @@
-package com.mod_author.mod_id
+package tech.harrynull.rpgreforged
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3
@@ -35,12 +35,12 @@ class MyComponents : EntityComponentInitializer, ItemComponentInitializer {
     companion object {
         val PLAYER_ATTRIBUTES: ComponentKey<PlayerAttributeComponent> =
             ComponentRegistryV3.INSTANCE.getOrCreate(
-                Identifier("mymod:player_attributes"),
+                Identifier("rpgreforged:player_attributes"),
                 PlayerAttributeComponent::class.java
             )
         val WEAPON_ATTRIBUTES: ComponentKey<WeaponRPGAttributeComponent> =
             ComponentRegistryV3.INSTANCE.getOrCreate(
-                Identifier("mymod:weapon_attributes"),
+                Identifier("rpgreforged:weapon_attributes"),
                 WeaponRPGAttributeComponent::class.java
             )
     }

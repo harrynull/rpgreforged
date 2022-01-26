@@ -1,4 +1,4 @@
-package com.mod_author.mod_id
+package tech.harrynull.rpgreforged
 
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.api.ModInitializer
@@ -13,8 +13,8 @@ import org.lwjgl.glfw.GLFW
 
 
 @Suppress("UNUSED")
-object ModName : ModInitializer {
-    private const val MOD_ID = "mod_id"
+object RpgReforged : ModInitializer {
+    private const val MOD_ID = "rpgreforged"
 
     override fun onInitialize() {
         ServerPlayerEvents.AFTER_RESPAWN.register { oldPlayer, newPlayer, alive ->

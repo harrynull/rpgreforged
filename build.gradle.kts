@@ -23,6 +23,24 @@ repositories {
         name = "CottonMC"
         url = uri("https://server.bbkr.space/artifactory/libs-release")
     }
+    maven {
+        url = uri("https://maven.shedaniel.me/")
+    }
+    maven {
+        url = uri("https://maven.terraformersmc.com/")
+    }
+    maven {
+        url = uri("https://maven.nucleoid.xyz/")
+    }
+    maven {
+        url = uri("https://www.cursemaven.com")
+
+        content {
+            includeGroup("curse.maven")
+        }
+    }
+
+    mavenLocal()
 }
 dependencies {
     val minecraftVersion: String by project
@@ -40,6 +58,13 @@ dependencies {
     modImplementation("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-item:4.0.1")
     modImplementation("io.github.onyxstudios.Cardinal-Components-API:cardinal-components-entity:4.0.1")
     modImplementation("io.github.natanfudge:fabric-drawer:4.1.0-1.17.1")
+    //modImplementation("curse.maven:dataattributes-514734:3605221") // 1.1.3
+    modImplementation("com.github.clevernucleus:DataAttributes:1.1.4")
+
+    modImplementation(include("eu.pb4:placeholder-api:1.1.3+1.17.1")!!)
+
+    //modImplementation(include("com.github.clevernucleus:PlayerEx:3.1.0")!!)
+
     modImplementation(include("io.github.cottonmc:LibGui:5.3.0+1.18")!!)
 }
 tasks {

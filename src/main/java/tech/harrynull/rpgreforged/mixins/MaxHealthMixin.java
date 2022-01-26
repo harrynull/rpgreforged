@@ -1,6 +1,6 @@
-package com.mod_author.mod_id.mixins;
+package tech.harrynull.rpgreforged.mixins;
 
-import com.mod_author.mod_id.AttributeType;
+import tech.harrynull.rpgreforged.AttributeType;
 import net.minecraft.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

@@ -1,4 +1,4 @@
-package com.mod_author.mod_id
+package tech.harrynull.rpgreforged
 
 import com.google.common.math.IntMath.pow
 import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent

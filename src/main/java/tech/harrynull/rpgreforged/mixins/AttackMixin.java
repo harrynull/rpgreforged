@@ -1,7 +1,7 @@
-package com.mod_author.mod_id.mixins;
+package tech.harrynull.rpgreforged.mixins;
 
-import com.mod_author.mod_id.AttributeType;
-import com.mod_author.mod_id.MyComponents;
+import tech.harrynull.rpgreforged.AttributeType;
+import tech.harrynull.rpgreforged.MyComponents;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;

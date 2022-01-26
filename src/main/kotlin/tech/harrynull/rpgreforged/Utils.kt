@@ -1,4 +1,4 @@
-package com.mod_author.mod_id
+package tech.harrynull.rpgreforged
 
 import net.minecraft.entity.attribute.EntityAttributeModifier
 import kotlin.math.pow

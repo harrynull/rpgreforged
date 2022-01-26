@@ -1,7 +1,7 @@
-package com.mod_author.mod_id.mixins;
+package tech.harrynull.rpgreforged.mixins;
 
 import com.google.common.collect.Multimap;
-import com.mod_author.mod_id.SwordAttributesAccess;
+import tech.harrynull.rpgreforged.SwordAttributesAccess;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.SwordItem;

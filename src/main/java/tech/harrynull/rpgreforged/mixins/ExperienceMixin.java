@@ -1,11 +1,11 @@
-package com.mod_author.mod_id.mixins;
+package tech.harrynull.rpgreforged.mixins;
 
-import com.mod_author.mod_id.PlayerAttributeComponentKt;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import tech.harrynull.rpgreforged.PlayerAttributeComponentKt;
 
 @Mixin(PlayerEntity.class)
 public class ExperienceMixin {

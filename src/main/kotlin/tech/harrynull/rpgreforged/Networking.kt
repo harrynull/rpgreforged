@@ -1,4 +1,4 @@
-package com.mod_author.mod_id
+package tech.harrynull.rpgreforged
 
 import drawer.readFrom
 import drawer.write

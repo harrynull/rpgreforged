@@ -1,4 +1,4 @@
-package com.mod_author.mod_id
+package tech.harrynull.rpgreforged
 
 import com.google.common.collect.ImmutableMultimap
 import com.google.common.collect.Multimap

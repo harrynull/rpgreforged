@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "com.mod_author.mod_id.mixins",
+  "package": "tech.harrynull.rpgreforged.mixins",
   "compatibilityLevel": "JAVA_17",
   "injectors": {
     "defaultRequire": 1

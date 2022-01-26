@@ -1,4 +1,4 @@
-package com.mod_author.mod_id
+package tech.harrynull.rpgreforged
 
 import io.github.cottonmc.cotton.gui.GuiDescription
 import io.github.cottonmc.cotton.gui.client.BackgroundPainter

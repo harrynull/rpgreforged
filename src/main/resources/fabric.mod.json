@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "mod_id",
+  "id": "rpgreforged",
   "version": "${version}",
   "name": "Mod Name",
   "description": "Mod Description",
@@ -19,21 +19,21 @@
     "main": [
       {
         "adapter": "kotlin",
-        "value": "com.mod_author.mod_id.ModName"
+        "value": "tech.harrynull.rpgreforged.RpgReforged"
       }
     ],
     "client": [
       {
         "adapter": "kotlin",
-        "value": "com.mod_author.mod_id.ClientEntrypoint"
+        "value": "tech.harrynull.rpgreforged.ClientEntrypoint"
       }
     ],
     "cardinal-components": [
-      "com.mod_author.mod_id.MyComponents"
+      "tech.harrynull.rpgreforged.MyComponents"
     ]
   },
   "mixins": [
-    "mod_id.mixins.json"
+    "rpgreforged.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.12.12",
@@ -45,8 +45,8 @@
   },
   "custom": {
     "cardinal-components": [
-      "mymod:weapon_attributes",
-      "mymod:player_attributes"
+      "rpgreforged:weapon_attributes",
+      "rpgreforged:player_attributes"
     ]
   }
 }
