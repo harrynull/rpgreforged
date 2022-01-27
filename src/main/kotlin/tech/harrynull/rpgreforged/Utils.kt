@@ -17,6 +17,10 @@ fun Double.toString(numOfDec: Int): String {
 fun additionMultiplier(id: UUID, value: Double, name: String) =
     EntityAttributeModifier(id, name, value, EntityAttributeModifier.Operation.ADDITION)
 
+fun addStats(map: MutableMap<AttributeType, Double>, attr: AttributeType, value: Double) {
+    map[attr] = map.getOrDefault(attr, 0.0) + value
+}
+
 fun genModifiers(
     multiMap: ImmutableMultimap.Builder<EntityAttribute?, EntityAttributeModifier?>,
     quality: Int,

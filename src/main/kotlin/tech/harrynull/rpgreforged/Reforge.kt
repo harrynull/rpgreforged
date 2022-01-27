@@ -1,55 +1,40 @@
 package tech.harrynull.rpgreforged
 
-import com.google.common.collect.ImmutableMultimap
-import net.minecraft.entity.attribute.EntityAttribute
-import net.minecraft.entity.attribute.EntityAttributeModifier
-import java.util.*
-
+private fun addStatsMap(
+    map: MutableMap<AttributeType, Double>,
+    quality: Int,
+    attrs: Map<AttributeType, Double>
+) {
+    attrs.forEach { (t, u) -> addStats(map, t, quality * u) }
+}
 
 enum class Reforge(
     val translationKey: String,
     val modifier: (
-        multiMap: ImmutableMultimap.Builder<EntityAttribute?, EntityAttributeModifier?>,
+        map: MutableMap<AttributeType, Double>,
         quality: Int
-    ) -> Unit,
-    val uuids: MutableList<UUID> = mutableListOf()
+    ) -> Unit
 ) {
     Raw("Raw", modifier = { _, _ -> }),
-    Sharp("Sharp", modifier = { multiMap, quality ->
-        genModifiers(
-            multiMap, quality, Sharp.uuids, mapOf(
-                AttributeType.STRENGTH to 3,
-            )
-        )
+    Sharp("Sharp", modifier = { map, quality ->
+        addStatsMap(map, quality, mapOf(AttributeType.STRENGTH to 3.0))
     }),
-    Wise("Wise", modifier = { multiMap, quality ->
-        genModifiers(
-            multiMap, quality, Wise.uuids, mapOf(
-                AttributeType.INTELLIGENCE to 3,
-            )
-        )
+    Wise("Wise", modifier = { map, quality ->
+        addStatsMap(map, quality, mapOf(AttributeType.INTELLIGENCE to 3.0))
     }),
-    Lucky("Lucky", modifier = { multiMap, quality ->
-        genModifiers(
-            multiMap, quality, Wise.uuids, mapOf(
-                AttributeType.LUCKINESS to 3,
-            )
-        )
+    Lucky("Lucky", modifier = { map, quality ->
+        addStatsMap(map, quality, mapOf(AttributeType.LUCKINESS to 3.0))
     }),
-    Light("Light", modifier = { multiMap, quality ->
-        genModifiers(
-            multiMap, quality, Wise.uuids, mapOf(
-                AttributeType.DEXTERITY to 3,
-            )
-        )
+    Light("Light", modifier = { map, quality ->
+        addStatsMap(map, quality, mapOf(AttributeType.DEXTERITY to 3.0))
     }),
-    Legendary("Legendary", modifier = { multiMap, quality ->
-        genModifiers(
-            multiMap, quality, Legendary.uuids, mapOf(
-                AttributeType.STRENGTH to 3,
-                AttributeType.DEXTERITY to 2,
-                AttributeType.INTELLIGENCE to 2,
-                AttributeType.LUCKINESS to 1,
+    Legendary("Legendary", modifier = { map, quality ->
+        addStatsMap(
+            map, quality, mapOf(
+                AttributeType.STRENGTH to 3.0,
+                AttributeType.DEXTERITY to 2.0,
+                AttributeType.INTELLIGENCE to 2.0,
+                AttributeType.LUCKINESS to 1.0,
             )
         )
     });
