@@ -6,8 +6,11 @@
     "defaultRequire": 1
   },
   "mixins": [
+    "AnvilMixin",
     "AttackMixin",
+    "ForgingScreenHandlerAccessor",
     "ItemStackMixin",
+    "ShapedRecipeMixin",
     "SwordItemMixin"
   ]
 }

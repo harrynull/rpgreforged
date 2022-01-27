@@ -31,9 +31,13 @@ interface RPGItemAttributes {
     fun numberOfSocketsByQuality(quality: Int): Int = quality.div(2.0).roundToInt()
 
     fun canAddSocket(socket: Socket): Boolean = sockets.any { it == Socket.EmptySocket }
+    
+    fun saveToNbt()
+    fun loadFromNbt()
 
     fun addSocket(socket: Socket) {
         sockets[sockets.indexOfFirst { it == Socket.EmptySocket }] = socket
+        saveToNbt()
     }
 
     fun randomQuality(): Int {
@@ -89,20 +93,20 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
 
     fun forge() {
         quality = randomQuality()
-        sockets = (0..numberOfSocketsByQuality(quality)).map { Socket.EmptySocket }.toMutableList()
+        sockets = (0 until numberOfSocketsByQuality(quality)).map { Socket.EmptySocket }.toMutableList()
         reforge = Reforge.randomReforge()
         saveToNbt()
     }
 
-    private fun saveToNbt() {
+    override fun saveToNbt() {
         putInt("quality", quality)
         sockets.forEachIndexed { index, socket -> putString("socket_$index", socket.name) }
         putString("reforge", reforge.name)
     }
 
-    private fun loadFromNbt() {
+    override fun loadFromNbt() {
         if (hasTag("quality")) quality = getInt("quality")
-        sockets = (0..quality).map {
+        sockets = (0 until quality).map {
             if (hasTag("socket_$it"))
                 Socket.valueOf(getString("socket_$it"))
             else Socket.EmptySocket

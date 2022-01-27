@@ -1,13 +1,24 @@
 package tech.harrynull.rpgreforged
 
 import com.google.common.collect.ImmutableMultimap
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings
 import net.minecraft.entity.attribute.EntityAttribute
 import net.minecraft.entity.attribute.EntityAttributeModifier
+import net.minecraft.item.Item
+import net.minecraft.item.ItemGroup
+import net.minecraft.item.ItemStack
 import net.minecraft.text.LiteralText
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import java.util.*
 
+class SocketItem(
+    val socket: Socket
+) : Item(FabricItemSettings().group(ItemGroup.MATERIALS).maxCount(1)) {
+    override fun getName(stack: ItemStack?): Text {
+        return LiteralText(socket.name)
+    }
+}
 
 enum class Socket(
     val description: Text,
@@ -26,4 +37,8 @@ enum class Socket(
         });
 
     val uuid: UUID = UUID.randomUUID()
+
+    companion object {
+        val items = values().filter { it != EmptySocket }.map { SocketItem(it) }
+    }
 }

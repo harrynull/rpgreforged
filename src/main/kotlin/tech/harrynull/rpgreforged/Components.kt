@@ -10,10 +10,16 @@ import net.minecraft.item.ItemStack
 import net.minecraft.item.SwordItem
 import net.minecraft.util.Identifier
 
+fun ItemStack.getWeaponComponent(): WeaponRPGAttributeComponent? {
+    return MyComponents.WEAPON_ATTRIBUTES.maybeGet(this)
+        .takeIf { it.isPresent }?.get()
+}
+
 class MyComponents : EntityComponentInitializer, ItemComponentInitializer {
     override fun registerEntityComponentFactories(registry: EntityComponentFactoryRegistry) {
     }
 
+    @Suppress("UnstableApiUsage")
     override fun registerItemComponentFactories(registry: ItemComponentFactoryRegistry) {
         registry.register(
             { item -> item is SwordItem },
