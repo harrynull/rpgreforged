@@ -7,10 +7,12 @@
   },
   "mixins": [
     "AnvilMixin",
+    "AnvilScreenHandlerAccessor",
     "AttackMixin",
     "ForgingScreenHandlerAccessor",
     "ItemStackMixin",
     "ShapedRecipeMixin",
+    "SmithingMixin",
     "SwordItemMixin"
   ]
 }

@@ -15,6 +15,13 @@ fun processSocket(itemStack: ItemStack, itemStack2: ItemStack): ItemStack? {
     return itemStackResult
 }
 
+fun shouldOverrideCombine(in1: ItemStack, in2: ItemStack): Boolean {
+    val attr1 = in1.getWeaponComponent() ?: return false
+    val attr2 = in2.getWeaponComponent() ?: return false
+    return attr1.quality == attr2.quality
+}
+
+
 fun processCombine(itemStack: ItemStack, itemStack2: ItemStack, itemStack3: ItemStack) {
     val attr1 = itemStack.getWeaponComponent() ?: return
     val attr2 = itemStack2.getWeaponComponent() ?: return

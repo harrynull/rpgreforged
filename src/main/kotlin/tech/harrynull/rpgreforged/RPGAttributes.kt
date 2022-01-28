@@ -52,6 +52,8 @@ interface RPGItemAttributes {
         if (rand < 0.95) return 4 // 10%
         return 5 // 5%
     }
+
+    fun reforge()
 }
 
 interface WeaponAttributes : RPGItemAttributes {
@@ -126,6 +128,11 @@ class WeaponRPGAttributeComponent(private val itemStack: ItemStack) :
     fun forge() {
         quality = randomQuality()
         sockets = (0 until numberOfSocketsByQuality(quality)).map { Socket.EmptySocket }.toMutableList()
+        reforge = Reforge.randomReforge()
+        saveToNbt()
+    }
+
+    override fun reforge() {
         reforge = Reforge.randomReforge()
         saveToNbt()
     }
