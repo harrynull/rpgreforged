@@ -23,8 +23,8 @@ public class SmithingMixin {
     @Inject(method = "onTakeOutput", at = @At("HEAD"))
     public void takeOutput(PlayerEntity player, ItemStack stack, CallbackInfo ci) {
         ForgingScreenHandlerAccessor accessor = (ForgingScreenHandlerAccessor) this;
-        SmithingMixinLogicKt.reforge(stack);
-        SmithingMixinLogicKt.reforge(accessor.getOutput().getStack(0));
+        if (SmithingMixinLogicKt.canReforge(accessor.getInput()))
+            SmithingMixinLogicKt.reforge(stack);
     }
 
     @Inject(method = "canTakeOutput", at = @At("HEAD"), cancellable = true)

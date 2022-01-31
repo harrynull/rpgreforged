@@ -7,9 +7,9 @@
   },
   "mixins": [
     "AnvilMixin",
-    "AnvilScreenHandlerAccessor",
     "AttackMixin",
     "ForgingScreenHandlerAccessor",
+    "ForgingScreenMixin",
     "ItemStackMixin",
     "ShapedRecipeMixin",
     "SmithingMixin",

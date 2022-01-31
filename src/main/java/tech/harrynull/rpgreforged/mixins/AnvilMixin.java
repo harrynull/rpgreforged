@@ -7,7 +7,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.AnvilScreenHandler;
 import net.minecraft.screen.ForgingScreenHandler;
 import net.minecraft.screen.Property;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -27,13 +29,10 @@ interface ForgingScreenHandlerAccessor {
 }
 
 @Mixin(AnvilScreenHandler.class)
-interface AnvilScreenHandlerAccessor {
-    @Accessor
-    Property getLevelCost();
-}
-
-@Mixin(AnvilScreenHandler.class)
 public abstract class AnvilMixin {
+    @Shadow
+    @Final
+    private Property levelCost;
 
     @Inject(
             method = "updateResult",
@@ -75,7 +74,7 @@ public abstract class AnvilMixin {
             ItemStack output = input1.copy();
             if (AnvilMixinLogicKt.shouldOverrideCombine(input1, input2)) {
                 AnvilMixinLogicKt.processCombine(input1, input2, output);
-                ((AnvilScreenHandlerAccessor) handler).getLevelCost().set(5);
+                levelCost.set(5);
                 accessor.getOutput().setStack(0, output);
                 handler.sendContentUpdates();
             }

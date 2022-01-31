@@ -30,13 +30,18 @@ enum class Reforge(
         addStatsMap(map, quality, mapOf(AttributeType.DEXTERITY to 3.0))
     }),
     Hard("Hard", modifier = { map, quality, _ ->
-        addStatsMap(map, quality, mapOf(AttributeType.CONSTITUTION to 3.0))
+        addStatsMap(
+            map, quality, mapOf(
+                AttributeType.CONSTITUTION to 3.0,
+                AttributeType.PROTECTION to 1.0
+            )
+        )
     }),
     Legendary("Legendary", modifier = { map, quality, type ->
         when (type) {
             ItemType.WEAPON -> {
                 addStatsMap(
-                    map, quality, kotlin.collections.mapOf(
+                    map, quality, mapOf(
                         AttributeType.STRENGTH to 3.0,
                         AttributeType.DEXTERITY to 2.0,
                         AttributeType.INTELLIGENCE to 2.0,
@@ -46,7 +51,7 @@ enum class Reforge(
             }
             ItemType.ARMOR -> {
                 addStatsMap(
-                    map, quality, kotlin.collections.mapOf(
+                    map, quality, mapOf(
                         AttributeType.DEXTERITY to 3.0,
                         AttributeType.INTELLIGENCE to 3.0,
                         AttributeType.LUCKINESS to 1.0,
@@ -61,6 +66,7 @@ enum class Reforge(
         fun randomReforge(itemType: ItemType): Reforge {
             val specializedForge = when (itemType) {
                 ItemType.ARMOR -> mapOf(
+                    Hard to 8,
                 )
                 ItemType.WEAPON -> mapOf(
                     Sharp to 5,
@@ -68,7 +74,6 @@ enum class Reforge(
             }
             val forgeToWeight = mapOf(
                 Legendary to 1,
-                Sharp to 5,
                 Wise to 5,
                 Lucky to 5,
                 Light to 5,
