@@ -47,7 +47,7 @@
   "custom": {
     "cardinal-components": [
       "rpgreforged:weapon_attributes",
-      "rpgreforged:player_attributes"
+      "rpgreforged:armor_attributes"
     ]
   }
 }

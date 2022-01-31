@@ -13,13 +13,12 @@ object RpgReforged : ModInitializer {
 
     override fun onInitialize() {
         ItemTooltipCallback.EVENT.register { itemStack, context, texts ->
-            val attributes = MyComponents.WEAPON_ATTRIBUTES.maybeGet(itemStack)
-                .takeIf { it.isPresent }?.get()
-                ?: return@register
+            val attributes = itemStack?.getRpgComponent() ?: return@register
 
             texts!!.removeAt(0) // remove name
             texts.addAll(0, attributes.toolTip())
         }
+
         Socket.items.forEach { socketItem ->
             Registry.register(
                 Registry.ITEM,

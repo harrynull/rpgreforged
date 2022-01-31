@@ -13,9 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import tech.harrynull.rpgreforged.MyComponents;
 import tech.harrynull.rpgreforged.RPGAttributesKt;
-import tech.harrynull.rpgreforged.WeaponRPGAttributeComponent;
 
 @Mixin(ItemStack.class)
 public abstract class ItemStackMixin {
@@ -37,8 +35,8 @@ public abstract class ItemStackMixin {
 
     @Inject(method = "onCraft", at = @At(value = "RETURN"))
     public void onCraft(World world, PlayerEntity player, int amount, CallbackInfo ci) {
-        ItemStack stack = (ItemStack) (Object) this;
-        MyComponents.Companion.getWEAPON_ATTRIBUTES().maybeGet(stack)
-                .ifPresent(WeaponRPGAttributeComponent::forge);
+        //ItemStack stack = (ItemStack) (Object) this;
+        //MyComponents.Companion.getWEAPON_ATTRIBUTES().maybeGet(stack)
+        //        .ifPresent(WeaponRPGAttributeComponent::forge);
     }
 }

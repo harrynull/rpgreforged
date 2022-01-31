@@ -11,11 +11,12 @@ enum class AttributeType(
     val icon: String,
     val formatting: Formatting
 ) {
-    CONSTITUTION(Identifier("playerex", "constitution"), "\uD83E\uDE93", Formatting.YELLOW),
+    CONSTITUTION(Identifier("playerex", "constitution"), "❤", Formatting.YELLOW),
     STRENGTH(Identifier("playerex", "strength"), "\uD83D\uDDE1", Formatting.RED),
     INTELLIGENCE(Identifier("playerex", "intelligence"), "❄", Formatting.BLUE),
     DEXTERITY(Identifier("playerex", "dexterity"), "\uD83C\uDFF9", Formatting.GREEN),
-    LUCKINESS(Identifier("playerex", "luckiness"), "\uD83E\uDDEA", Formatting.AQUA);
+    LUCKINESS(Identifier("playerex", "luckiness"), "☘", Formatting.GREEN),
+    PROTECTION(Identifier("minecraft", "generic.armor"), "\uD83D\uDEE1", Formatting.BLUE);
 
     val attribute: Supplier<EntityAttribute>
 

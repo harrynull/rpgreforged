@@ -9,10 +9,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import tech.harrynull.rpgreforged.MyComponents;
-import tech.harrynull.rpgreforged.WeaponRPGAttributeComponent;
-
-import java.util.Optional;
+import tech.harrynull.rpgreforged.RPGAttributesKt;
 
 @Mixin(ShapedRecipe.class)
 public abstract class ShapedRecipeMixin {
@@ -22,10 +19,7 @@ public abstract class ShapedRecipeMixin {
 
     @Inject(method = "craft", at = @At("HEAD"), cancellable = true)
     public void craft(CraftingInventory craftingInventory, CallbackInfoReturnable<ItemStack> callbackInfoReturnable) {
-        ItemStack copy = output.copy();
-        Optional<WeaponRPGAttributeComponent> attr = MyComponents.Companion.getWEAPON_ATTRIBUTES().maybeGet(copy);
-        if (attr.isEmpty()) return;
-        attr.get().forge();
-        callbackInfoReturnable.setReturnValue(copy);
+        ItemStack transformed = RPGAttributesKt.onCraftCallback(output.copy());
+        if (transformed != null) callbackInfoReturnable.setReturnValue(transformed);
     }
 }
